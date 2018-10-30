@@ -59,7 +59,6 @@ def initializeCommunities(n):
 
 def generateWithNX():
     G = nx.planted_partition_graph(5, 50, 0.5, 0.001)
-    nx.draw(G)
-    plt.show()
+    return G
 
 generate()
