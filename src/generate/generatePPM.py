@@ -24,6 +24,7 @@ def generate():
                     G.add_edge(i, j)
     return G
 
+#make all parameters
 def initializeCommunities(n):
     k = 5 #number of communities
     k_n1 = 1000 #number of vertices in each community
