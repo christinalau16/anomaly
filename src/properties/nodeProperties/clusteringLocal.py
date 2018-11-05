@@ -1,11 +1,10 @@
 import networkx as nx
 
-def clusteringCoefficient(G):
-    average = nx.average_clustering(G)
-    print("global clustering coefficient: " + str(average))
+def localClustering(G, n):
+    c = nx.clustering(G, n)
+    print("local clustering coefficient: " + str(c))
 
 from src.preprocess.csvToGraph import convert
 emailSet = 'data/datasetEmail/datasetEmail_final.csv'
 politicalSet = 'data/datasetPolitical/datasetPolitical_final.csv'
-graph = convert(emailSet)
-clusteringCoefficient(graph)
+localClustering(convert(emailSet), 212)
