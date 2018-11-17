@@ -9,7 +9,7 @@ def computeTrun(G):
     kArr = []
     errorArr = []
 
-    k = 530
+    k = 20
     error = 1
 
     #Express graph as graph adjacency matrix / SciPy sparse matrix
@@ -30,7 +30,7 @@ def computeTrun(G):
         kArr.append(k)
         errorArr.append(error)
 
-        k = k + 10
+        k = k + 50
 
     plotkError(kArr, errorArr)
     return finalU
@@ -39,11 +39,11 @@ def plotkError(kArr, errorArr):
     #Draw loglog graph
     plt.plot(kArr, errorArr, linestyle='None',
            marker='x', markeredgecolor='blue')
-    plt.title("Log-log graph, political set")
+    plt.title("Linear-linear graph, political set")
     plt.ylabel("Reconstruction Error")
     plt.xlabel("k")
-    plt.xscale('log')
-    plt.yscale('log')
+    #plt.xscale('log')
+    #plt.yscale('log')
     plt.show()
 
 from src.preprocess.csvToGraph import convert

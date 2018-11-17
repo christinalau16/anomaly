@@ -7,13 +7,13 @@ import scipy as sp
 import matplotlib.pyplot as plt
 import src.generate.generatePPM as genPPM
 
-def computeTopSVal(n):
+def computeTopSVal(G, n):
     nArr = []
     for i in range(n):
         nArr.append(n-i)
 
     #Generate graph
-    G = genPPM.generate()
+    #G = genPPM.generate()
     #Express graph as graph adjacency matrix / SciPy sparse matrix
     M = sp.sparse.csc_matrix(nx.to_scipy_sparse_matrix(G)).asfptype()
     #Find greatest n singular values of matrix
@@ -24,6 +24,9 @@ def computeTopSVal(n):
            marker='x', markeredgecolor='blue')
     plt.xscale('log')
     plt.yscale('log')
+    plt.title("Log-log graph, political set")
+    plt.ylabel("Singular Value")
+    plt.xlabel("k")
     plt.show()
 
 def computeAllSVal():
@@ -51,4 +54,6 @@ def computeAllSVal():
     plt.yscale('log')
     plt.show()
 
-computeTopSVal(50)
+from src.preprocess.csvToGraph import convert
+politicalSet = 'data/datasetPolitical/datasetPolitical_final.csv'
+computeTopSVal(convert(politicalSet), 600)
