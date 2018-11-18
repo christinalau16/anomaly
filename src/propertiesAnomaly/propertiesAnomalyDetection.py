@@ -9,7 +9,8 @@ from src.properties.nodeProperties.computeAll import compute_vertex_properties
 def computeAllProperties(G):
     M = []
     for node in G.nodes():
-        p = compute_vertex_properties(G, node)
+        p = compute_vertex_properties(G, node, properties = ['degree', 'ego_edge_count', 'ego_singular_value', 'clustering_coefficient'])
+        print(p)
         M.append(p)
     return M
 
