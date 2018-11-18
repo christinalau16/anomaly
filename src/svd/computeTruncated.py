@@ -9,7 +9,7 @@ def computeTrun(G):
     kArr = []
     errorArr = []
 
-    k = 20
+    k = 530
     error = 1
 
     #Express graph as graph adjacency matrix / SciPy sparse matrix
@@ -30,9 +30,9 @@ def computeTrun(G):
         kArr.append(k)
         errorArr.append(error)
 
-        k = k + 50
+        k = k + 10
 
-    plotkError(kArr, errorArr)
+    #plotkError(kArr, errorArr)
     return finalU
 
 def plotkError(kArr, errorArr):
@@ -49,4 +49,4 @@ def plotkError(kArr, errorArr):
 from src.preprocess.csvToGraph import convert
 emailSet = 'data/datasetEmail/datasetEmail_final.csv'
 politicalSet = 'data/datasetPolitical/datasetPolitical_final.csv'
-computeTrun(convert(politicalSet))
+#computeTrun(convert(politicalSet))

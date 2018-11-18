@@ -1,36 +1,46 @@
 import networkx as nx
 import scipy as sp
 import pandas as pd
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
+from sklearn.ensemble import IsolationForest
 from sklearn import metrics
 import matplotlib.pyplot as plt
+import random
 
-def classifyData(M):
+def detectIsolation(M):
     data = pd.DataFrame(M)
-    idx = 0
-    new_col = (data.index < 758).astype(int)
-    data.insert(loc=idx, column = 'y', value=new_col)
 
-    X = data.iloc[:,1:]
-    y = data.iloc[:,0]
+    outlierIndexes = random.sample(range(758, 1489), 30)
+    print("outlierIndexes: ", str(outlierIndexes))
+    testIndexes = [i for i in range(0, 758)] + outlierIndexes
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+    X_train = data
+    X_test = data.iloc[data.index.isin(testIndexes)]
+    print("shape of X_test: " + str(X_test.shape))
 
-    classifier = LogisticRegression(random_state=0)
-    classifier.fit(X_train, y_train)
-    y_pred = classifier.predict(X_test)
+    y_test=[]
+    for i in range(len(X_test.index)):
+        if i < 758:
+            y_test.append(1)
+        else:
+            y_test.append(-1)
+
+    # 0.038 = 30/(758 + 30)
+    clf= IsolationForest(contamination=float(0.038))
+    clf.fit(X_train)
+    y_pred = clf.predict(X_test)
+
+    count = 1
+    for j in range(len(y_pred)):
+        if y_pred[j] == -1:
+            print("found anomaly " + str(count) + " at index " + str(testIndexes[j]))
+            count = count + 1
 
     accuracy_score = metrics.accuracy_score(y_test, y_pred)
     print("accuracy score: " + str(accuracy_score))
 
-    confusion_matrix = metrics.confusion_matrix(y_test, y_pred)
-    print("confusion matrix: ")
-    print(confusion_matrix)
-
     return accuracy_score
 
-def classifyDataGeneric(G):
+def detectIsolationGeneric(G):
     #Calculate Frobenius norm for matrix A
     normA = sp.linalg.norm(nx.adjacency_matrix(G).toarray())
 
@@ -53,7 +63,7 @@ def classifyDataGeneric(G):
         error = normAB / normA
 
         print("k: " + str(k))
-        accuracy = classifyData(U)
+        accuracy = detectIsolation(U)
 
         kArr.append(k)
         accuracyArr.append(accuracy)
@@ -73,7 +83,7 @@ def plotkError(kArr, accuracyArr):
 from src.preprocess.csvToGraph import convert
 emailSet = 'data/datasetEmail/datasetEmail_final.csv'
 politicalSet = 'data/datasetPolitical/datasetPolitical_final.csv'
-#from src.svd.computeTruncated import computeTrun
-#M = computeTrun(convert(politicalSet))
-#classifyData(M)
-classifyDataGeneric(convert(politicalSet))
+from src.svd.computeTruncated import computeTrun
+M = computeTrun(convert(politicalSet))
+#detectIsolation(M)
+detectIsolationGeneric(convert(politicalSet))
