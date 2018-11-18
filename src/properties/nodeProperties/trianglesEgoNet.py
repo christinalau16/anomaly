@@ -9,4 +9,4 @@ def numTriangles(G, n):
 from src.preprocess.csvToGraph import convert
 emailSet = 'data/datasetEmail/datasetEmail_final.csv'
 politicalSet = 'data/datasetPolitical/datasetPolitical_final.csv'
-numTriangles(convert(emailSet), 212)
+numTriangles(convert(politicalSet), 0)
