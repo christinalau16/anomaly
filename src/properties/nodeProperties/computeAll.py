@@ -34,5 +34,5 @@ def compute_vertex_properties(graph, vertex, properties=['degree', 'ego_edge_cou
 #from src.preprocess.csvToGraph import convert
 #emailSet = 'data/datasetEmail/datasetEmail_final.csv'
 #politicalSet = 'data/datasetPolitical/datasetPolitical_final.csv'
-#arr = compute_vertex_properties(convert(politicalSet), 0)
+#arr = compute_vertex_properties(convert(politicalSet), 1)
 #print(arr)

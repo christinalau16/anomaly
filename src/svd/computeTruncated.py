@@ -9,13 +9,15 @@ def computeTrun(G):
     kArr = []
     errorArr = []
 
-    k = 530
+    k = 10
     error = 1
 
     #Express graph as graph adjacency matrix / SciPy sparse matrix
     A = sp.sparse.csc_matrix(nx.to_scipy_sparse_matrix(G)).asfptype()
 
+    #while(k <=100):
     while (error > 0.1):
+        print("k: ", k)
         #Find greatest n singular values of matrix
         U, S, VT = sp.sparse.linalg.svds(A, k)
         B = U.dot(sp.sparse.diags(S).dot(VT))
@@ -30,9 +32,9 @@ def computeTrun(G):
         kArr.append(k)
         errorArr.append(error)
 
-        k = k + 10
+        k = k + 20
 
-    #plotkError(kArr, errorArr)
+    plotkError(kArr, errorArr)
     return finalU
 
 def plotkError(kArr, errorArr):
@@ -49,4 +51,4 @@ def plotkError(kArr, errorArr):
 from src.preprocess.csvToGraph import convert
 emailSet = 'data/datasetEmail/datasetEmail_final.csv'
 politicalSet = 'data/datasetPolitical/datasetPolitical_final.csv'
-#computeTrun(convert(politicalSet))
+computeTrun(convert(politicalSet))

@@ -4,49 +4,72 @@ import pandas as pd
 from sklearn.ensemble import IsolationForest
 from sklearn import metrics
 import random
+import pickle
 from src.properties.nodeProperties.computeAll import compute_vertex_properties
 
 def computeAllProperties(G):
+    print(G.number_of_edges)
+    print(G.number_of_nodes)
+    print("shape of G's adjacency matrix: " + str(nx.adjacency_matrix(G).shape))
     M = []
     for node in G.nodes():
-        p = compute_vertex_properties(G, node, properties = ['degree', 'ego_edge_count', 'ego_singular_value', 'clustering_coefficient'])
+        p = compute_vertex_properties(G, node, properties = ['degree', 'ego_edge_count', 'ego_triangle_count', 'ego_singular_value', 'clustering_coefficient'])
         print(p)
         M.append(p)
+    print("shape of M: ", len(M))
     return M
 
+def sortFirst(val):
+    return val[0]
+
 def detectIsolation(M):
+    N = 758
+    n = 30
+
+    lookup_classify = pickle.load(open('data/datasetPolitical/blogs_classify.pkl', 'rb'))
+    print(lookup_classify)
+
     data = pd.DataFrame(M)
 
-    outlierIndexes = random.sample(range(758, 1489), 30)
-    print("outlierIndexes: ", str(outlierIndexes))
-    testIndexes = [i for i in range(0, 758)] + outlierIndexes
+    accuracyArr = []
+    for j in range(20):
+        random.seed(j)
+        first = [k for k, v in lookup_classify.items() if v == 0]
+        second = [k for k, v in lookup_classify.items() if v == 1]
+        outlierIndexes = random.sample(second, n)
+        print("outlierIndexes: ", str(outlierIndexes))
+        testIndexes = first + outlierIndexes
+        #print("testIndexes: ", str(testIndexes))
 
-    X_train = data
-    X_test = data.iloc[data.index.isin(testIndexes)]
-    print("shape of X_test: " + str(X_test.shape))
+        X = data.iloc[data.index.isin(testIndexes)]
+        print("shape of X: " + str(X.shape))
 
-    y_test=[]
-    for i in range(len(X_test.index)):
-        if i < 758:
-            y_test.append(1)
-        else:
-            y_test.append(-1)
+        contamination_value = float(n) / (N+n)
+        print("contamination value: " + str(contamination_value))
+        clf= IsolationForest(contamination=contamination_value)
+        clf.fit(X)
+        anomaly_score = clf.decision_function(X)
 
-    # 0.038 = 30/(758 + 30)
-    clf= IsolationForest(contamination=float(0.038))
-    clf.fit(X_train)
-    y_pred = clf.predict(X_test)
+        indexed_anomaly_score = []
+        for i in range(len(anomaly_score)):
+            indexed_anomaly_score.append([anomaly_score[i], testIndexes[i]])
+        #print("indexed anomaly score: ", indexed_anomaly_score)
+        indexed_anomaly_score.sort(key = sortFirst)
+        #print("indexed anomaly score sorted: ", indexed_anomaly_score)
 
-    count = 1
-    for j in range(len(y_pred)):
-        if y_pred[j] == -1:
-            print("found anomaly " + str(count) + " at index " + str(testIndexes[j]))
-            count = count + 1
+        count = 0
+        for i in range(n):
+            if indexed_anomaly_score[i][1] in outlierIndexes:
+                print("found correct anomaly index: ", str(indexed_anomaly_score[i][1]))
+                count = count + 1
+        print("count: " + str(count))
+        accuracy_score = float(count) / n
+        print("accuracy score: " + str(accuracy_score))
+        accuracyArr.append(accuracy_score)
 
-    accuracy_score = metrics.accuracy_score(y_test, y_pred)
-    print("accuracy score: " + str(accuracy_score))
-
-    return accuracy_score
+    averageAccuracy = sum(accuracyArr, 0.0) / len(accuracyArr)
+    print("average accuracy score: " + str(averageAccuracy))
+    return averageAccuracy
 
 from src.preprocess.csvToGraph import convert
 emailSet = 'data/datasetEmail/datasetEmail_final.csv'

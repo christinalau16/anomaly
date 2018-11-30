@@ -5,30 +5,34 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn import metrics
 import matplotlib.pyplot as plt
+import pickle
 
 def classifyData(M):
+    lookup_classify = pickle.load(open('data/datasetPolitical/blogs_classify.pkl', 'rb'))
+
     data = pd.DataFrame(M)
-    idx = 0
-    new_col = (data.index < 758).astype(int)
-    data.insert(loc=idx, column = 'y', value=new_col)
+    new_col = []
+    for i in range(data.shape[0]):
+        new_col.append(lookup_classify[i])
+    data.insert(loc=0, column = 'y', value=new_col)
 
     X = data.iloc[:,1:]
     y = data.iloc[:,0]
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
+    accuracyArr = []
+    for i in range(20):
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=i)
 
-    classifier = LogisticRegression(random_state=0)
-    classifier.fit(X_train, y_train)
-    y_pred = classifier.predict(X_test)
+        classifier = LogisticRegression(random_state=i)
+        classifier.fit(X_train, y_train)
+        y_pred = classifier.predict(X_test)
 
-    accuracy_score = metrics.accuracy_score(y_test, y_pred)
-    print("accuracy score: " + str(accuracy_score))
-
-    confusion_matrix = metrics.confusion_matrix(y_test, y_pred)
-    print("confusion matrix: ")
-    print(confusion_matrix)
-
-    return accuracy_score
+        accuracy_score = metrics.accuracy_score(y_test, y_pred)
+        print("accuracy score: " + str(accuracy_score))
+        accuracyArr.append(accuracy_score)
+    averageAccuracy = sum(accuracyArr, 0.0) / len(accuracyArr)
+    print("average accuracy score: " + str(averageAccuracy))
+    return averageAccuracy
 
 def classifyDataGeneric(G):
     #Calculate Frobenius norm for matrix A
@@ -37,13 +41,15 @@ def classifyDataGeneric(G):
     kArr = []
     accuracyArr = []
 
-    k = 20
+    k = 1
     error = 1
 
     #Express graph as graph adjacency matrix / SciPy sparse matrix
     A = sp.sparse.csc_matrix(nx.to_scipy_sparse_matrix(G)).asfptype()
+    print("shape of A: " + str(A.shape))
 
-    while (error > 0.1):
+    #while (error > 0.1):
+    while(k <= 50):
         #Find greatest n singular values of matrix
         U, S, VT = sp.sparse.linalg.svds(A, k)
         B = U.dot(sp.sparse.diags(S).dot(VT))
@@ -58,14 +64,14 @@ def classifyDataGeneric(G):
         kArr.append(k)
         accuracyArr.append(accuracy)
 
-        k = k + 50
+        k = k + 1
 
     plotkError(kArr, accuracyArr)
 
 def plotkError(kArr, accuracyArr):
     plt.plot(kArr, accuracyArr, linestyle='None',
            marker='x', markeredgecolor='blue')
-    plt.title("Linear-linear graph, classification accuracy vs. k, political set")
+    plt.title("k={1...50}, Linear-linear graph, average classification accuracy vs. k, political set")
     plt.ylabel("Classification Accuracy")
     plt.xlabel("k")
     plt.show()

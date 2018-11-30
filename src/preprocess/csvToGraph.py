@@ -10,5 +10,5 @@ def convert(infile):
     #print(G.number_of_edges())
     return G
 
-convert('data/datasetEmail/datasetEmail_final.csv')
+#convert('data/datasetEmail/datasetEmail_final.csv')
 #convert('data/datasetPolitical/datasetPolitical_final.csv')

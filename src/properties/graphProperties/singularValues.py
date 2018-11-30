@@ -22,9 +22,9 @@ def computeTopSVal(G, n):
     #Draw loglog graph
     plt.plot(nArr, s, linestyle='None',
            marker='x', markeredgecolor='blue')
-    plt.xscale('log')
-    plt.yscale('log')
-    plt.title("Log-log graph, political set")
+    #plt.xscale('log')
+    #plt.yscale('log')
+    plt.title("Linear-linear graph, political set")
     plt.ylabel("Singular Value")
     plt.xlabel("k")
     plt.show()
@@ -55,5 +55,5 @@ def computeAllSVal():
     plt.show()
 
 from src.preprocess.csvToGraph import convert
-politicalSet = 'data/datasetPolitical/datasetPolitical_final.csv'
+politicalSet = 'data/datasetPolitical/datasetPolitical_final2.csv'
 computeTopSVal(convert(politicalSet), 600)
