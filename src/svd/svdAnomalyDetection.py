@@ -32,6 +32,7 @@ def detectIsolation(M):
         X = data.iloc[data.index.isin(testIndexes)]
         print("shape of X: " + str(X.shape))
 
+        """
         u1 = data.iloc[data.index.isin(testIndexes)][data.columns[0]]
         u2 = data.iloc[data.index.isin(testIndexes)][data.columns[1]]
         plt.plot(u1, u2, linestyle='None',
@@ -45,6 +46,7 @@ def detectIsolation(M):
         plt.ylabel("u2")
         plt.xlabel("u1")
         plt.show()
+        """
 
         contamination_value = float(n) / (N+n)
         print("contamination value: " + str(contamination_value))
@@ -90,44 +92,23 @@ def detectIsolationGeneric(G):
     #Express graph as graph adjacency matrix / SciPy sparse matrix
     A = sp.sparse.csc_matrix(nx.to_scipy_sparse_matrix(G)).asfptype()
 
-    rowA = []
-    colA = []
-    rowAfirst = []
-    colAfirst = []
-    rowAsecond = []
-    colAsecond = []
-
-    A = nx.adjacency_matrix(G).toarray()
-    print(A)
-
-    for row in range(1224):
-        for col in range(1224):
-            if A[row][col] != 0:
-                rowA.append(row)
-                colA.append(col)
-    plt.plot(rowA, colA, linestyle='None',
-           marker='.', markeredgecolor='red')
-    plt.ylabel("col")
-    plt.xlabel("row")
-    plt.show()
     #while(k <= 2):
-    #while (error > 0.1):
+    while (error > 0.1):
         #Find greatest n singular values of matrix
-    U, S, VT = sp.sparse.linalg.svds(A, k)
-    B = U.dot(sp.sparse.diags(S).dot(VT))
+        U, S, VT = sp.sparse.linalg.svds(A, k)
+        B = U.dot(sp.sparse.diags(S).dot(VT))
 
         #Calculate Frobenius norm for matrix A-B
-    normAB = sp.linalg.norm(A - B)
-    error = normAB / normA
+        normAB = sp.linalg.norm(A - B)
+        error = normAB / normA
 
-    print("k: " + str(k))
-    accuracy = detectIsolation(U)
+        print("k: " + str(k))
+        accuracy = detectIsolation(U)
 
-    kArr.append(k)
-    accuracyArr.append(accuracy)
+        kArr.append(k)
+        accuracyArr.append(accuracy)
 
-
-    k = k+1
+        k = k*2
 
     plotkError(kArr, accuracyArr)
 
@@ -153,29 +134,8 @@ def printMatrix(infile):
     plt.xlabel("row")
     plt.show()
 
-    C1u1 = data.iloc[data.index.isin(first)][data.columns[0]]
-    C1u2 = data.iloc[data.index.sisin(first)][data.columns[1]]
-    plt.plot(C1u1, C1u2, linestyle='None',
-           marker='x', markeredgecolor='blue')
-    plt.ylabel("u2")
-    plt.xlabel("u1")
-    plt.show()
-
-    C2u1 = data.iloc[data.index.isin(second)][data.columns[0]]
-    C2u2 = data.iloc[data.index.isin(second)][data.columns[1]]
-    plt.plot(C2u1, C2u2, linestyle='None',
-           marker='x', markeredgecolor='red')
-
-    plt.ylabel("u2")
-    plt.xlabel("u1")
-    plt.show()
-
 from src.preprocess.csvToGraph import convert
 emailSet = 'data/datasetEmail/datasetEmail_final.csv'
 politicalSet = 'data/datasetPolitical/datasetPolitical_final1.csv'
-#from src.svd.computeTruncated import computeTrun
-#M = computeTrun(convert(politicalSet))
-#detectIsolation(M)
-#detectIsolationGeneric(convert(politicalSet))
-
-printMatrix(politicalSet)
+detectIsolationGeneric(convert(politicalSet))
+#printMatrix(politicalSet)

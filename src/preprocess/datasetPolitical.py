@@ -10,7 +10,7 @@ def loadData(delimiter):
     lookup_mapping = dict() #old node number to new node number
     lookup_classify = dict() #new node number to class number
 
-    with open('data/datasetPolitical/blogs.dat.txt') as infile, open('data/datasetPolitical/datasetPolitical_final1.csv','w') as outfile:
+    with open('data/datasetPolitical/blogs.dat.txt') as infile, open('data/datasetPolitical/datasetPolitical_final.csv','w') as outfile:
         for line in itertools.islice(infile, HEADER_COUNT, TOTAL_COUNT - FOOTER_COUNT):
             src, dest, weight = line.strip().split(delimiter)
             if weight != "0":
